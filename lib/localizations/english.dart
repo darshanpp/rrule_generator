@@ -25,16 +25,16 @@ class EnglishRRuleTextDelegate implements RRuleTextDelegate {
   String get days => 'Day(s)';
 
   @override
-  String get instances => 'instance(s)';
+  String get instances => 'occurrence';
 
   @override
-  String get neverEnds => 'Never ends';
+  String get neverEnds => 'Never';
 
   @override
-  String get endsAfter => 'Ends after';
+  String get endsAfter => 'After';
 
   @override
-  String get endsOnDate => 'Ends on date';
+  String get endsOnDate => 'On';
 
   @override
   List<String> get daysInMonth => [
@@ -80,4 +80,50 @@ class EnglishRRuleTextDelegate implements RRuleTextDelegate {
         'Daily',
         'Never',
       ];
+
+  @override
+  String get repeatsOn => 'Repeat On';
+
+  @override
+  List<String> get repeatsEveryList => [
+    'Daily',
+    'Weekly',
+    'Monthly',
+    'Yearly',
+  ];
+
+  @override
+  String get repeatsEvery => 'Repeats every';
+
+  @override
+  String get ends => 'Ends';
+
+  @override
+  List<String> get endsOptionList => [
+    'Never',
+    'On',
+    'After',
+  ];
+
+  @override
+  List<String> get recurringList => [
+    'Does not repeat',
+    'Custom'
+  ];
+  @override
+  String get first => 'first';
+  @override
+  String get second => 'second';
+  @override
+  String get third => 'third';
+  @override
+  String get fourth => 'fourth';
+  @override
+  String get last => 'last';
+  @override
+  String get monthlyOn => 'Monthly on';
+  @override
+  String get monthlyOnThe => 'Monthly on the';
+  @override
+  String get start => 'Start';
 }

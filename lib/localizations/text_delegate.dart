@@ -10,16 +10,27 @@ class RRuleTextDelegate {
   String get months => 'Month(s)';
 
   String get weeks => 'Week(s)';
+  String get repeatsOn => 'Repeats on';
+  String get repeatsEvery => 'Repeats every';
+  String get ends => 'Ends';
+  String get first => 'first';
+  String get second => 'second';
+  String get third => 'third';
+  String get fourth => 'fourth';
+  String get last => 'last';
+  String get monthlyOn => 'Monthly on';
+  String get monthlyOnThe => 'Monthly on the';
+  String get start => 'Start';
 
   String get days => 'Day(s)';
 
-  String get instances => 'instance(s)';
+  String get instances => 'occurrence';
 
-  String get neverEnds => 'Never ends';
+  String get neverEnds => 'Never';
 
-  String get endsAfter => 'Ends after';
+  String get endsAfter => 'After';
 
-  String get endsOnDate => 'Ends on date';
+  String get endsOnDate => 'On';
 
   List<String> get daysInMonth => [
         '1st',
@@ -61,4 +72,21 @@ class RRuleTextDelegate {
         'Daily',
         'Never',
       ];
+  List<String> get repeatsEveryList => [
+    'Daily',
+    'Weekly',
+    'Monthly',
+    'Yearly',
+  ];
+
+  List<String> get endsOptionList => [
+    'Never',
+    'On',
+    'After',
+  ];
+
+  List<String> get recurringList => [
+    'Does not repeat',
+    'Custom'
+  ];
 }

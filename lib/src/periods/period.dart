@@ -15,11 +15,13 @@ class Period extends Widget {
   final RRuleTextDelegate textDelegate;
   final Function onChange;
   final String initialRRule;
+  DateTime startDate;
 
-  const Period(this.textDelegate, this.onChange, this.initialRRule, {Key? key})
+  Period(this.textDelegate, this.onChange, this.initialRRule,this.startDate, {Key? key})
       : super(key: key);
 
   String getRRule() => throw UnimplementedError();
+  void refresh(DateTime date) => throw UnimplementedError();
 
   void handleInitialRRule() => throw UnimplementedError();
 

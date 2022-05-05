@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rrule_generator/localizations/text_delegate.dart';
+import 'package:rrule_generator/src/periods/constants.dart';
 
 class WeekdayPicker extends StatelessWidget {
   final RRuleTextDelegate textDelegate;
@@ -12,22 +13,39 @@ class WeekdayPicker extends StatelessWidget {
       : super(key: key);
 
   @override
-  Widget build(BuildContext context) => Column(
+  Widget build(BuildContext context) => Row(
         children: List.generate(
           7,
           (index) => ValueListenableBuilder(
             valueListenable: weekdayNotifiers[index],
             builder: (BuildContext context, bool value, Widget? child) =>
-                CheckboxListTile(
-              value: value,
-              onChanged: (bool? newValue) {
-                weekdayNotifiers[index].value = newValue!;
-                onChange();
-              },
-              title: Text(
-                textDelegate.weekdays[index],
-              ),
-            ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: GestureDetector(
+                      onTap:(){
+                        weekdayNotifiers[index].value = !weekdayNotifiers[index].value;
+                        onChange();
+                      },
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          return ConstrainedBox(
+                            constraints: BoxConstraints(minHeight: constraints.maxWidth, minWidth: constraints.maxWidth),
+                            child: Container(
+                              decoration: value ? Constants.selectedBoxDecoration : null,
+                              child: Center(
+                                child: Text(
+                                  textDelegate.weekdays[index].characters.first.toUpperCase(),
+                                  style: value ? Constants.selectedTextStyle : Constants.unSelectedTextStyle,
+                                )
+                              )
+                            ),
+                          );
+                        }
+                      ),
+                    ),
+                  ),
+                ),
           ),
         ),
       );
