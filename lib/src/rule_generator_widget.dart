@@ -9,33 +9,34 @@ import 'package:rrule_generator/src/periods/yearly.dart';
 import 'package:rrule_generator/src/periods/monthly.dart';
 import 'package:rrule_generator/src/periods/weekly.dart';
 import 'package:rrule_generator/src/periods/daily.dart';
-import 'package:intl/intl.dart';
 
 class RRuleGenerator extends StatelessWidget {
   final RRuleTextDelegate textDelegate;
   final Function(String newValue, DateTime startDate)? onChange;
   final String initialRRule;
 
-  final frequencyNotifier = ValueNotifier(0);
-  final countTypeNotifier = ValueNotifier(0);
+  final frequencyNotifier = ValueNotifier<RepeatsEvery?>(RepeatsEvery.daily);
+  final countTypeNotifier = ValueNotifier<EndsType>(EndsType.never);
   final pickedDateNotifier = ValueNotifier(DateTime.now());
   final instancesController = TextEditingController(text: '1');
   final List<Period> periodWidgets = [];
   final intervalController = TextEditingController(text: '1');
   DateTime? startDate;
+  final bool isSundaySow;
 
   RRuleGenerator({Key? key,
     this.textDelegate = const EnglishRRuleTextDelegate(),
     this.onChange,
     this.startDate,
+    this.isSundaySow = false,
     this.initialRRule = ''})
       : super(key: key) {
     startDate ??= DateTime.now();
     periodWidgets.addAll([
+      Daily(textDelegate, valueChanged, initialRRule, startDate!),
+      Weekly(textDelegate, valueChanged, initialRRule, startDate!, isSundaySow),
+      Monthly(textDelegate, valueChanged, initialRRule, startDate!, isSundaySow),
       Yearly(textDelegate, valueChanged, initialRRule, startDate!),
-      Monthly(textDelegate, valueChanged, initialRRule, startDate!),
-      Weekly(textDelegate, valueChanged, initialRRule, startDate!),
-      Daily(textDelegate, valueChanged, initialRRule, startDate!)
     ]);
 
     handleInitialRRule();
@@ -49,22 +50,29 @@ class RRuleGenerator extends StatelessWidget {
           intervalIndex, intervalEnd == -1 ? initialRRule.length : intervalEnd);
       intervalController.text = interval;
     }
+    
     if (initialRRule.contains('MONTHLY')) {
-      frequencyNotifier.value = 1;
-    } else if (initialRRule.contains('WEEKLY')) {
-      frequencyNotifier.value = 2;
-    } else if (initialRRule.contains('DAILY')) {
-      frequencyNotifier.value = 3;
-    } else if (initialRRule == '') {
-      frequencyNotifier.value = 4;
+      frequencyNotifier.value = RepeatsEvery.monthly;
+    } 
+    else if (initialRRule.contains('WEEKLY')) {
+      frequencyNotifier.value = RepeatsEvery.weekly;
+    } 
+    else if (initialRRule.contains('DAILY')) {
+      frequencyNotifier.value = RepeatsEvery.daily;
+    } 
+    else if (initialRRule.contains('YEARLY')) {
+      frequencyNotifier.value = RepeatsEvery.yearly;
+    }
+    else if (initialRRule == '') {
+      frequencyNotifier.value = null;
     }
 
     if (initialRRule.contains('COUNT')) {
-      countTypeNotifier.value = 2;
+      countTypeNotifier.value = EndsType.after;
       instancesController.text = initialRRule.substring(
           initialRRule.indexOf('COUNT=') + 6, initialRRule.length);
     } else if (initialRRule.contains('UNTIL')) {
-      countTypeNotifier.value = 1;
+      countTypeNotifier.value = EndsType.endOn;
       int dateIndex = initialRRule.indexOf('UNTIL=') + 6;
       int year = int.parse(initialRRule.substring(dateIndex, dateIndex + 4));
       int month =
@@ -84,15 +92,16 @@ class RRuleGenerator extends StatelessWidget {
   String getRRule() {
     int interval = int.tryParse(intervalController.text) ?? 0;
 
-    if (frequencyNotifier.value == 4) {
+    if (frequencyNotifier.value == null) {
       return '';
     }
 
-    if (countTypeNotifier.value == 0) {
-      return 'RRULE:' + periodWidgets[frequencyNotifier.value].getRRule() + ';INTERVAL=${interval > 0 ? interval : 1}';
-    } else if (countTypeNotifier.value == 2) {
+    if (countTypeNotifier.value == EndsType.never) {
+      return 'RRULE:' + periodWidgets[frequencyNotifier.value!.index].getRRule() + ';INTERVAL=${interval > 0 ? interval : 1}';
+    } 
+    else if (countTypeNotifier.value == EndsType.after) {
       return 'RRULE:' +
-          periodWidgets[frequencyNotifier.value].getRRule() +
+          periodWidgets[frequencyNotifier.value!.index].getRRule() +
           ';COUNT=${instancesController.text}'+ ';INTERVAL=${interval > 0 ? interval : 1}';
     }
     DateTime pickedDate = pickedDateNotifier.value;
@@ -103,19 +112,17 @@ class RRuleGenerator extends StatelessWidget {
     pickedDate.month > 9 ? '${pickedDate.month}' : '0${pickedDate.month}';
 
     return 'RRULE:' +
-        periodWidgets[frequencyNotifier.value].getRRule() +
-        ';UNTIL=${pickedDate.year}$month$day'+ ';INTERVAL=${interval > 0 ? interval : 1}';
-
-        
+        periodWidgets[frequencyNotifier.value!.index].getRRule() +
+        ';UNTIL=${pickedDate.year}$month$day'+ ';INTERVAL=${interval > 0 ? interval : 1}';      
   }
 
   @override
   Widget build(BuildContext context) =>
       Padding(
         padding: const EdgeInsets.all(8.0),
-        child: ValueListenableBuilder(
+        child: ValueListenableBuilder<RepeatsEvery?>(
           valueListenable: frequencyNotifier,
-          builder: (BuildContext context, int period, Widget? child) =>
+          builder: (BuildContext context, period, Widget? child) =>
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -133,19 +140,19 @@ class RRuleGenerator extends StatelessWidget {
                       Expanded(
                         flex: 5,
                         child: Row(
-                          children: List.generate(4, (index) => Expanded(
+                          children: List.generate(RepeatsEvery.values.length, (index) => Expanded(
                             child: GestureDetector(
                               onTap: (){
-                                frequencyNotifier.value = mapRepeatEveryToPeriods(index);
+                                frequencyNotifier.value = RepeatsEvery.values[index];
                                 valueChanged();
                               },
                               child: Container(
-                                decoration: period == mapRepeatEveryToPeriods(index) ? Constants.selectedBoxDecoration : null,
+                                decoration: period == RepeatsEvery.values[index] ? Constants.selectedBoxDecoration : null,
                                 child: FittedBox(
                                   fit: BoxFit.scaleDown,
                                   child: Center(child: Padding(
                                     padding: const EdgeInsets.all(8.0),
-                                    child: Text(textDelegate.repeatsEveryList[index], style: period == mapRepeatEveryToPeriods(index) ? Constants.selectedTextStyle : Constants.unSelectedTextStyle,),
+                                    child: Text(textDelegate.repeatsEveryList[index], style: period == RepeatsEvery.values[index] ? Constants.selectedTextStyle : Constants.unSelectedTextStyle,),
                                   )),
                                 )
                               ),
@@ -156,9 +163,9 @@ class RRuleGenerator extends StatelessWidget {
                       
                     ],
                   ),
-                  SizedBox(height: period == 4 ? 0 : 16),
-                  period == 4 ? Container() : periodWidgets[period],
-                  SizedBox(height: period == 4 ? 0 : 16),
+                  SizedBox(height: period == null ? 0 : 16),
+                  period == null ? Container() : periodWidgets[period.index],
+                  SizedBox(height: period == null ? 0 : 16),
                   Text(textDelegate.start, style: Constants.captionTextStyle,),
                   Row(
                     children: [
@@ -176,27 +183,27 @@ class RRuleGenerator extends StatelessWidget {
                       ),
                     ],
                   ),
-                  period == 4
+                  period == null
                       ? Container()
-                      : ValueListenableBuilder(
+                      : ValueListenableBuilder<EndsType>(
                     valueListenable: countTypeNotifier,
                     builder:
-                        (BuildContext context, int countType, Widget? child) =>
+                        (BuildContext context, countType, Widget? child) =>
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            SizedBox(height: period == 4 ? 0 : 16),
+                            SizedBox(height: 16),
                             Text(textDelegate.ends, style: Constants.captionTextStyle,),
-                          ]+ List.generate(3, (index){
+                          ]+ List.generate(EndsType.values.length, (index){
                             return GestureDetector(
                               onTap: (){
-                                countTypeNotifier.value = index;
+                                countTypeNotifier.value = EndsType.values[index];
                                 valueChanged();
                               },
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Container(
-                                  decoration: index == countTypeNotifier.value ? Constants.selectedBoxDecoration : null,
+                                  decoration: EndsType.values[index] == countTypeNotifier.value ? Constants.selectedBoxDecoration : null,
                                   child: Row(
                                     children: [
                                       Expanded(
@@ -205,17 +212,17 @@ class RRuleGenerator extends StatelessWidget {
                                           padding: const EdgeInsets.all(8.0),
                                           child: Text(
                                             textDelegate.endsOptionList[index],
-                                            style: index == countTypeNotifier.value ? Constants.selectedTextStyle : Constants.unSelectedTextStyle,
+                                            style: EndsType.values[index] == countTypeNotifier.value ? Constants.selectedTextStyle : Constants.unSelectedTextStyle,
                                           ),
                                         ),
                                       ),
-                                      index == 1 ? Expanded(
+                                      index == EndsType.endOn.index ? Expanded(
                                         flex: 3,
                                         child: ValueListenableBuilder(
                                           valueListenable: pickedDateNotifier,
                                           builder: (context, DateTime pickedDate, _) {
                                             return AbsorbPointer(
-                                              absorbing: index != countTypeNotifier.value,
+                                              absorbing: EndsType.values[index] != countTypeNotifier.value,
                                               child: RRuleDatePicker(
                                                 date: pickedDate, 
                                                 onChange: (picked){
@@ -228,10 +235,10 @@ class RRuleGenerator extends StatelessWidget {
                                           }
                                         ),
                                       ):SizedBox(),
-                                      index == 2 ? Expanded(
+                                      index == EndsType.after.index ? Expanded(
                                         flex: 3,
                                         child: AbsorbPointer(
-                                          absorbing: index != countTypeNotifier.value,
+                                          absorbing: EndsType.values[index] != countTypeNotifier.value,
                                           child: Row(
                                             children: [
                                               Expanded(
@@ -256,17 +263,5 @@ class RRuleGenerator extends StatelessWidget {
                 ],
               ),
         ),
-      );
-
-
-  int mapRepeatEveryToPeriods(int repeatEvery){
-    switch(repeatEvery){
-      case 0: return 3;
-      case 1: return 2;
-      case 2: return 1;
-      case 3: return 0;
-      default: return 0;
-    }
-  }    
-    
+      );    
 }

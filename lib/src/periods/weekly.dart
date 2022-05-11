@@ -15,13 +15,15 @@ class Weekly extends StatelessWidget implements Period {
   @override
   DateTime startDate;
 
+  bool isSundaySow;
+
   // final intervalController = TextEditingController(text: '1');
   final weekdayNotifiers = List.generate(
     7,
     (index) => ValueNotifier(false),
   );
 
-  Weekly(this.textDelegate, this.onChange, this.initialRRule,this.startDate, {Key? key})
+  Weekly(this.textDelegate, this.onChange, this.initialRRule,this.startDate, this.isSundaySow, {Key? key})
       : super(key: key) {
     if (initialRRule.contains('WEEKLY')) handleInitialRRule();
   }
@@ -40,7 +42,7 @@ class Weekly extends StatelessWidget implements Period {
       String weekdays = initialRRule.substring(
           weekdayIndex, weekdayEnd == -1 ? initialRRule.length : weekdayEnd);
       for (int i = 0; i < 7; i++) {
-        if (weekdays.contains(weekdaysShort[i])) {
+        if (weekdays.contains(weekdaysShortM[i])) {
           weekdayNotifiers[i].value = true;
         }
       }
@@ -52,7 +54,7 @@ class Weekly extends StatelessWidget implements Period {
     // int interval = int.tryParse(intervalController.text) ?? 0;
     List<String> weekdayList = [];
     for (int i = 0; i < 7; i++) {
-      if (weekdayNotifiers[i].value) weekdayList.add(weekdaysShort[i]);
+      if (weekdayNotifiers[i].value) weekdayList.add(isSundaySow ? weekdaysShortS[i] : weekdaysShortM[i]);
     }
 
     return weekdayList.isEmpty
@@ -71,7 +73,7 @@ class Weekly extends StatelessWidget implements Period {
             children: [
               SizedBox(height: 8.0,),
               Text(textDelegate.repeatsOn, style: Constants.captionTextStyle,),
-              WeekdayPicker(weekdayNotifiers, textDelegate, onChange),
+              WeekdayPicker(weekdayNotifiers, textDelegate, onChange, isSundaySow),
             ],
           )
         ],

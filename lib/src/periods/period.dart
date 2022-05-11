@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rrule_generator/localizations/text_delegate.dart';
 
-final weekdaysShort = [
+final weekdaysShortM = [
   'MO',
   'TU',
   'WE',
@@ -9,6 +9,15 @@ final weekdaysShort = [
   'FR',
   'SA',
   'SU',
+];
+final weekdaysShortS = [
+  'SU',
+  'MO',
+  'TU',
+  'WE',
+  'TH',
+  'FR',
+  'SA'
 ];
 
 class Period extends Widget {

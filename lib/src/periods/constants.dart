@@ -28,6 +28,19 @@ class Constants{
   }
 }
 
+enum EndsType{
+  never,
+  endOn,
+  after
+}
+
+enum RepeatsEvery{
+  daily,
+  weekly,
+  monthly,
+  yearly
+}
+
 extension DateTimeExtension on DateTime {
   int get weekOfMonth {
     var wom = 0;

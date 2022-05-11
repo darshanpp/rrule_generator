@@ -7,8 +7,8 @@ class WeekdayPicker extends StatelessWidget {
   final Function onChange;
 
   final List<ValueNotifier<bool>> weekdayNotifiers;
-
-  const WeekdayPicker(this.weekdayNotifiers, this.textDelegate, this.onChange,
+  final bool isSundaySow;
+  const WeekdayPicker(this.weekdayNotifiers, this.textDelegate, this.onChange, this.isSundaySow,
       {Key? key})
       : super(key: key);
 
@@ -35,7 +35,7 @@ class WeekdayPicker extends StatelessWidget {
                               decoration: value ? Constants.selectedBoxDecoration : null,
                               child: Center(
                                 child: Text(
-                                  textDelegate.weekdays[index].characters.first.toUpperCase(),
+                                  textDelegate.weekdays(isSundaySow)[index].characters.first.toUpperCase(),
                                   style: value ? Constants.selectedTextStyle : Constants.unSelectedTextStyle,
                                 )
                               )

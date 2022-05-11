@@ -17,9 +17,10 @@ class Monthly extends StatelessWidget implements Period {
   final monthDayNotifier = ValueNotifier(1);
   final weekdayNotifier = ValueNotifier(0);
   final dayNotifier = ValueNotifier(1);
+  final bool isSundaySow;
   // final intervalController = TextEditingController(text: '1');
 
-  Monthly(this.textDelegate, this.onChange, this.initialRRule,this.startDate, {Key? key})
+  Monthly(this.textDelegate, this.onChange, this.initialRRule,this.startDate, this.isSundaySow,{Key? key})
       : super(key: key) {
     
     monthDayNotifier.value = startDate.weekOfMonth-1;
@@ -65,7 +66,7 @@ class Monthly extends StatelessWidget implements Period {
       int weekdayIndex = initialRRule.indexOf('BYDAY=') + 6;
       String weekday = initialRRule.substring(weekdayIndex, weekdayIndex + 2);
 
-      weekdayNotifier.value = weekdaysShort.indexOf(weekday);
+      weekdayNotifier.value = weekdaysShortM.indexOf(weekday);
     }
   }
 
@@ -73,15 +74,13 @@ class Monthly extends StatelessWidget implements Period {
   String getRRule() {
     if (monthTypeNotifier.value == 0) {
       int byMonthDay = dayNotifier.value;
-      // String interval = intervalController.text;
       return 'FREQ=MONTHLY;BYMONTHDAY=$byMonthDay';//;INTERVAL=$interval';
-    } else {
-      String byDay = weekdaysShort[weekdayNotifier.value];
+    } 
+    else {
+      String byDay = weekdaysShortM[weekdayNotifier.value];
       int bySetPos =
           (monthDayNotifier.value < 4) ? monthDayNotifier.value + 1 : -1;
-      // int interval = int.tryParse(intervalController.text) ?? 0;
-      return 'FREQ=MONTHLY;'//;INTERVAL=${interval > 0 ? interval : 1};'
-          'BYDAY=$byDay;BYSETPOS=$bySetPos';
+      return 'FREQ=MONTHLY;BYDAY=$byDay;BYSETPOS=$bySetPos';
     }
   }
 
@@ -91,9 +90,6 @@ class Monthly extends StatelessWidget implements Period {
       valueListenable: monthTypeNotifier,
       builder: (BuildContext context, int monthType, _) => Column(
         children: [ 
-          // Text(textDelegate.every),
-          // IntervalPicker(intervalController, onChange),
-          // Text(textDelegate.months),
           Row(
             children: [
               Expanded(
@@ -123,13 +119,11 @@ class Monthly extends StatelessWidget implements Period {
                     items: [
                       DropdownMenuItem(
                         value: 0,
-                        // child: Text(textDelegate.monthlyOn + ' day ${DateTime.now().day}'),
                         child: Text(textDelegate.monthlyOn + ' day ${dayNotifier.value}', style: monthType == 0 ? Constants.textFieldStyle : null,),
                       ),
                       DropdownMenuItem(
                         value: 1,
-                        // child: Text(textDelegate.monthlyOn + ' the ${mapWomToWords(DateTime.now().weekOfMonth)} ${textDelegate.weekdays[DateTime.now().weekday-1]}'),
-                        child: Text(textDelegate.monthlyOn + ' the ${mapWomToWords(monthDayNotifier.value)} ${textDelegate.weekdays[weekdayNotifier.value]}', style: monthType == 1 ? Constants.textFieldStyle : null,),
+                        child: Text(textDelegate.monthlyOn + ' the ${mapWomToWords(monthDayNotifier.value)} ${textDelegate.weekdays(false)[weekdayNotifier.value]}', style: monthType == 1 ? Constants.textFieldStyle : null,),
                       ),
                     ],
                   ),
