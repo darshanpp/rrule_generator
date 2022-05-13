@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:rrule_generator/localizations/text_delegate.dart';
 import 'package:rrule_generator/src/periods/period.dart';
 
 class Daily extends StatelessWidget implements Period {
-  @override
-  final RRuleTextDelegate textDelegate;
+
   @override
   final Function onChange;
   @override
@@ -14,7 +12,7 @@ class Daily extends StatelessWidget implements Period {
 
   // final intervalController = TextEditingController(text: '1');
 
-  Daily(this.textDelegate, this.onChange,  this.initialRRule, this.startDate,{Key? key})
+  Daily(this.onChange,  this.initialRRule, this.startDate,{Key? key})
       : super(key: key) {
     if (initialRRule.contains('DAILY')) handleInitialRRule();
   }

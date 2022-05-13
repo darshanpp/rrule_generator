@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:rrule_generator/localizations/localized_text.dart';
 import 'package:rrule_generator/rrule_generator.dart';
-import 'package:rrule_generator/localizations/english.dart';
 // import 'package:rrule/rrule.dart';
 void main() {
   runApp(const MyApp());
@@ -18,9 +18,9 @@ class MyApp extends StatelessWidget {
         body: SingleChildScrollView(
           child: RRuleGenerator(
             startDate: DateTime(2022,6,2),
-            initialRRule:
-                'FREQ=DAILY;INTERVAL=2',
-            textDelegate: const EnglishRRuleTextDelegate(),
+            startWeekWith: DateTime.wednesday,
+            initialRRule:'FREQ=DAILY;INTERVAL=2',
+            localizedTextFromApp: LocalizedText(),
             onChange: (String newValue, startDate){
               print('RRule: $newValue');
               // final rrule = RecurrenceRule.fromString(newValue);

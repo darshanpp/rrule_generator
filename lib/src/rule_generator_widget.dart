@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:rrule_generator/localizations/english.dart';
-import 'package:rrule_generator/localizations/text_delegate.dart';
+import 'package:rrule_generator/localizations/localized_text.dart';
 import 'package:rrule_generator/src/periods/constants.dart';
 import 'package:rrule_generator/src/periods/period.dart';
 import 'package:rrule_generator/src/periods/pickers/date_picker.dart';
@@ -11,9 +10,9 @@ import 'package:rrule_generator/src/periods/weekly.dart';
 import 'package:rrule_generator/src/periods/daily.dart';
 
 class RRuleGenerator extends StatelessWidget {
-  final RRuleTextDelegate textDelegate;
   final Function(String newValue, DateTime startDate)? onChange;
   final String initialRRule;
+  LocalizedText localizedTextFromApp;
 
   final frequencyNotifier = ValueNotifier<RepeatsEvery?>(RepeatsEvery.daily);
   final countTypeNotifier = ValueNotifier<EndsType>(EndsType.never);
@@ -22,24 +21,41 @@ class RRuleGenerator extends StatelessWidget {
   final List<Period> periodWidgets = [];
   final intervalController = TextEditingController(text: '1');
   DateTime? startDate;
-  final bool isSundaySow;
+  List<String> repeatsEveryList = [];
+  List<String> endsOptionList = [];
+  int startWeekWith;
 
   RRuleGenerator({Key? key,
-    this.textDelegate = const EnglishRRuleTextDelegate(),
     this.onChange,
     this.startDate,
-    this.isSundaySow = false,
+    required this.localizedTextFromApp,
+    this.startWeekWith = DateTime.monday,
     this.initialRRule = ''})
       : super(key: key) {
     startDate ??= DateTime.now();
     periodWidgets.addAll([
-      Daily(textDelegate, valueChanged, initialRRule, startDate!),
-      Weekly(textDelegate, valueChanged, initialRRule, startDate!, isSundaySow),
-      Monthly(textDelegate, valueChanged, initialRRule, startDate!, isSundaySow),
-      Yearly(textDelegate, valueChanged, initialRRule, startDate!),
+      Daily(valueChanged, initialRRule, startDate!),
+      Weekly(valueChanged, initialRRule, startDate!, startWeekWith),
+      Monthly(valueChanged, initialRRule, startDate!),
+      Yearly(valueChanged, initialRRule, startDate!),
     ]);
-
+    initializeData();
     handleInitialRRule();
+  }
+
+  void initializeData(){
+    localizedText = localizedTextFromApp;
+    repeatsEveryList = [
+      localizedText.repeatDaily,
+      localizedText.repeatWeekly,
+      localizedText.repeatMonthly,
+      localizedText.repeatYearly,
+    ];
+    endsOptionList = [
+      localizedText.endsNever,
+      localizedText.onDate,
+      localizedText.endsAfter,
+    ];
   }
 
   void handleInitialRRule() {
@@ -127,7 +143,7 @@ class RRuleGenerator extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(textDelegate.repeatsEvery, style: Constants.captionTextStyle,),
+                  Text(localizedText.repeatsEvery, style: Constants.captionTextStyle,),
                   SizedBox(height: 4.0,),
                   Row(
                     children: [
@@ -152,7 +168,7 @@ class RRuleGenerator extends StatelessWidget {
                                   fit: BoxFit.scaleDown,
                                   child: Center(child: Padding(
                                     padding: const EdgeInsets.all(8.0),
-                                    child: Text(textDelegate.repeatsEveryList[index], style: period == RepeatsEvery.values[index] ? Constants.selectedTextStyle : Constants.unSelectedTextStyle,),
+                                    child: Text(repeatsEveryList[index], style: period == RepeatsEvery.values[index] ? Constants.selectedTextStyle : Constants.unSelectedTextStyle,),
                                   )),
                                 )
                               ),
@@ -166,12 +182,12 @@ class RRuleGenerator extends StatelessWidget {
                   SizedBox(height: period == null ? 0 : 16),
                   period == null ? Container() : periodWidgets[period.index],
                   SizedBox(height: period == null ? 0 : 16),
-                  Text(textDelegate.start, style: Constants.captionTextStyle,),
+                  Text(localizedText.start, style: Constants.captionTextStyle,),
                   Row(
                     children: [
                       Padding(
                         padding: const EdgeInsets.all(16.0),
-                        child: Text(textDelegate.endsOnDate, style: Constants.unSelectedTextStyle),
+                        child: Text(localizedText.onDate, style: Constants.unSelectedTextStyle),
                       ),
                       RRuleDatePicker(
                         date: startDate!,
@@ -193,7 +209,7 @@ class RRuleGenerator extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             SizedBox(height: 16),
-                            Text(textDelegate.ends, style: Constants.captionTextStyle,),
+                            Text(localizedText.ends, style: Constants.captionTextStyle,),
                           ]+ List.generate(EndsType.values.length, (index){
                             return GestureDetector(
                               onTap: (){
@@ -211,7 +227,7 @@ class RRuleGenerator extends StatelessWidget {
                                         child: Padding(
                                           padding: const EdgeInsets.all(8.0),
                                           child: Text(
-                                            textDelegate.endsOptionList[index],
+                                            endsOptionList[index],
                                             style: EndsType.values[index] == countTypeNotifier.value ? Constants.selectedTextStyle : Constants.unSelectedTextStyle,
                                           ),
                                         ),
@@ -247,7 +263,7 @@ class RRuleGenerator extends StatelessWidget {
                                               SizedBox(width: 8.0,),
                                               Expanded(
                                                 flex: 3,
-                                                child: Text(textDelegate.instances, style: Constants.unSelectedTextStyle,))
+                                                child: Text(localizedText.occurrence, style: Constants.unSelectedTextStyle,))
                                             ],
                                           ),
                                         ),

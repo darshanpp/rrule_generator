@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:rrule_generator/localizations/text_delegate.dart';
+import 'package:rrule_generator/localizations/text_utils.dart';
 import 'package:rrule_generator/src/periods/constants.dart';
 import 'package:rrule_generator/src/periods/period.dart';
 
+import '../../localizations/localized_text.dart';
+
 class Monthly extends StatelessWidget implements Period {
-  @override
-  final RRuleTextDelegate textDelegate;
   @override
   final Function onChange;
   @override
@@ -15,16 +15,14 @@ class Monthly extends StatelessWidget implements Period {
 
   final monthTypeNotifier = ValueNotifier(0);
   final monthDayNotifier = ValueNotifier(1);
-  final weekdayNotifier = ValueNotifier(0);
+  final weekdayNotifier = ValueNotifier<WeekModel>(TextUtils.weekDays.first);
   final dayNotifier = ValueNotifier(1);
-  final bool isSundaySow;
-  // final intervalController = TextEditingController(text: '1');
 
-  Monthly(this.textDelegate, this.onChange, this.initialRRule,this.startDate, this.isSundaySow,{Key? key})
+  Monthly(this.onChange, this.initialRRule,this.startDate,{Key? key})
       : super(key: key) {
     
     monthDayNotifier.value = startDate.weekOfMonth-1;
-    weekdayNotifier.value = startDate.weekday-1;
+    weekdayNotifier.value = TextUtils.weekDays.firstWhere((element) => element.weekDay == startDate.weekday);
     dayNotifier.value = startDate.day;
 
     if (initialRRule.contains('MONTHLY')){
@@ -44,13 +42,8 @@ class Monthly extends StatelessWidget implements Period {
       } else {
         dayNotifier.value = int.parse(day[0]);
       }
-
-      // int intervalIndex = initialRRule.indexOf('INTERVAL=') + 9;
-      // int intervalEnd = initialRRule.indexOf(';', intervalIndex);
-      // String interval = initialRRule.substring(
-      //     intervalIndex, intervalEnd == -1 ? initialRRule.length : intervalEnd);
-      // intervalController.text = interval;
-    } else {
+    } 
+    else {
       monthTypeNotifier.value = 1;
 
       int monthDayIndex = initialRRule.indexOf('BYSETPOS=') + 9;
@@ -65,8 +58,8 @@ class Monthly extends StatelessWidget implements Period {
 
       int weekdayIndex = initialRRule.indexOf('BYDAY=') + 6;
       String weekday = initialRRule.substring(weekdayIndex, weekdayIndex + 2);
-
-      weekdayNotifier.value = weekdaysShortM.indexOf(weekday);
+      weekdayNotifier.value = TextUtils.weekDays.firstWhere((element) => element.shortName == weekday);
+      
     }
   }
 
@@ -77,7 +70,7 @@ class Monthly extends StatelessWidget implements Period {
       return 'FREQ=MONTHLY;BYMONTHDAY=$byMonthDay';//;INTERVAL=$interval';
     } 
     else {
-      String byDay = weekdaysShortM[weekdayNotifier.value];
+      String byDay = weekdayNotifier.value.shortName;
       int bySetPos =
           (monthDayNotifier.value < 4) ? monthDayNotifier.value + 1 : -1;
       return 'FREQ=MONTHLY;BYDAY=$byDay;BYSETPOS=$bySetPos';
@@ -111,7 +104,7 @@ class Monthly extends StatelessWidget implements Period {
                         dayNotifier.value = startDate.day;
                       }
                       else if(newMonthType == 1){
-                        weekdayNotifier.value = startDate.weekday - 1;
+                        weekdayNotifier.value = TextUtils.weekDays.firstWhere((element) => element.weekDay == startDate.weekday);
                         monthDayNotifier.value = startDate.weekOfMonth - 1;
                       }
                       onChange();
@@ -119,11 +112,11 @@ class Monthly extends StatelessWidget implements Period {
                     items: [
                       DropdownMenuItem(
                         value: 0,
-                        child: Text(textDelegate.monthlyOn + ' day ${dayNotifier.value}', style: monthType == 0 ? Constants.textFieldStyle : null,),
+                        child: Text(localizedText.monthlyOnDay + ' ${dayNotifier.value}', style: monthType == 0 ? Constants.textFieldStyle : null,),
                       ),
                       DropdownMenuItem(
                         value: 1,
-                        child: Text(textDelegate.monthlyOn + ' the ${mapWomToWords(monthDayNotifier.value)} ${textDelegate.weekdays(false)[weekdayNotifier.value]}', style: monthType == 1 ? Constants.textFieldStyle : null,),
+                        child: Text(localizedText.monthlyOnThe + ' ${mapWomToWords(monthDayNotifier.value)} ${weekdayNotifier.value.localizedName}', style: monthType == 1 ? Constants.textFieldStyle : null,),
                       ),
                     ],
                   ),
@@ -138,11 +131,11 @@ class Monthly extends StatelessWidget implements Period {
 
   String mapWomToWords(int wom){
     switch(wom){
-      case 0: return textDelegate.first;
-      case 1: return textDelegate.second;
-      case 2: return textDelegate.third;
-      case 3: return textDelegate.fourth;
-      default: return textDelegate.last;
+      case 0: return localizedText.first;
+      case 1: return localizedText.second;
+      case 2: return localizedText.third;
+      case 3: return localizedText.fourth;
+      default: return localizedText.last;
     }
   }
 
@@ -150,7 +143,7 @@ class Monthly extends StatelessWidget implements Period {
   void refresh(DateTime date) {
     startDate = date;
     monthDayNotifier.value = date.weekOfMonth-1;
-    weekdayNotifier.value = date.weekday-1;
+    weekdayNotifier.value = TextUtils.weekDays.firstWhere((element) => element.weekDay == date.weekday);
     dayNotifier.value = date.day;
     monthTypeNotifier.notifyListeners();
   }

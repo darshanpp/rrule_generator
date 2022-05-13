@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:rrule_generator/localizations/text_delegate.dart';
 import 'package:rrule_generator/src/periods/period.dart';
 
 class Yearly extends StatelessWidget implements Period {
-  @override
-  final RRuleTextDelegate textDelegate;
   @override
   final Function onChange;
   @override
@@ -18,7 +15,7 @@ class Yearly extends StatelessWidget implements Period {
   // final monthNotifier = ValueNotifier(DateTime.now().month);
   // final dayNotifier = ValueNotifier(DateTime.now().day);
 
-  Yearly(this.textDelegate, this.onChange, this.initialRRule,this.startDate, {Key? key})
+  Yearly(this.onChange, this.initialRRule,this.startDate, {Key? key})
       : super(key: key) {
     if (initialRRule.contains('YEARLY')) handleInitialRRule();
   }

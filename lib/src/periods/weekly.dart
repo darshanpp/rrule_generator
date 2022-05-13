@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:rrule_generator/localizations/text_delegate.dart';
+import 'package:rrule_generator/localizations/localized_text.dart';
 import 'package:rrule_generator/src/periods/constants.dart';
-import 'package:rrule_generator/src/periods/pickers/interval.dart';
 import 'package:rrule_generator/src/periods/period.dart';
 import 'package:rrule_generator/src/periods/pickers/weekday.dart';
 
+import '../../localizations/text_utils.dart';
+
 class Weekly extends StatelessWidget implements Period {
-  @override
-  final RRuleTextDelegate textDelegate;
   @override
   final Function onChange;
   @override
@@ -15,37 +14,38 @@ class Weekly extends StatelessWidget implements Period {
   @override
   DateTime startDate;
 
-  bool isSundaySow;
+  int startWeekWith;
 
-  // final intervalController = TextEditingController(text: '1');
-  final weekdayNotifiers = List.generate(
-    7,
-    (index) => ValueNotifier(false),
-  );
+  List<WeekModel> weekDays = [];
 
-  Weekly(this.textDelegate, this.onChange, this.initialRRule,this.startDate, this.isSundaySow, {Key? key})
+  Weekly(this.onChange, this.initialRRule,this.startDate, this.startWeekWith,  {Key? key})
       : super(key: key) {
+    _initializeWeekDaysInDigits(startWeekWith);
     if (initialRRule.contains('WEEKLY')) handleInitialRRule();
+  }
+
+  void _initializeWeekDaysInDigits(int startDay){
+    weekDays = rotate(TextUtils.weekDays, startWeekWith%7);
+  }
+  
+  List<WeekModel> rotate(List<WeekModel> list, int v) {
+    if(list.isEmpty) return list;
+    var i = v % list.length;
+    return list.sublist(i)..addAll(list.sublist(0, i));
   }
 
   @override
   void handleInitialRRule() {
-    // int intervalIndex = initialRRule.indexOf('INTERVAL=') + 9;
-    // int intervalEnd = initialRRule.indexOf(';', intervalIndex);
-    // String interval = initialRRule.substring(
-    //     intervalIndex, intervalEnd == -1 ? initialRRule.length : intervalEnd);
-    // intervalController.text = interval;
-
     if (initialRRule.contains('BYDAY=')) {
       int weekdayIndex = initialRRule.indexOf('BYDAY=') + 6;
       int weekdayEnd = initialRRule.indexOf(';', weekdayIndex);
-      String weekdays = initialRRule.substring(
+      String initialWeekdays = initialRRule.substring(
           weekdayIndex, weekdayEnd == -1 ? initialRRule.length : weekdayEnd);
-      for (int i = 0; i < 7; i++) {
-        if (weekdays.contains(weekdaysShortM[i])) {
-          weekdayNotifiers[i].value = true;
+      weekDays.forEach((element) { 
+        if (initialWeekdays.contains(element.shortName)) {
+          element.isSelected.value = true;
         }
-      }
+      });
     }
   }
 
@@ -53,27 +53,27 @@ class Weekly extends StatelessWidget implements Period {
   String getRRule() {
     // int interval = int.tryParse(intervalController.text) ?? 0;
     List<String> weekdayList = [];
-    for (int i = 0; i < 7; i++) {
-      if (weekdayNotifiers[i].value) weekdayList.add(isSundaySow ? weekdaysShortS[i] : weekdaysShortM[i]);
-    }
+    
+    weekDays.forEach((element) { 
+      if(element.isSelected.value){
+        weekdayList.add(element.shortName);
+      }
+    });
 
     return weekdayList.isEmpty
-        ? 'FREQ=WEEKLY'//INTERVAL=${interval > 0 ? interval : 1}'
-        : 'FREQ=WEEKLY;'//INTERVAL=${interval > 0 ? interval : 1};'
-            'BYDAY=${weekdayList.join(",")}';
+        ? 'FREQ=WEEKLY'
+        : 'FREQ=WEEKLY;BYDAY=${weekdayList.join(",")}';
   }
 
   @override
   Widget build(BuildContext context) => Column(
         children: [
-          // Text(textDelegate.every),
-          // IntervalPicker(intervalController, onChange),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(height: 8.0,),
-              Text(textDelegate.repeatsOn, style: Constants.captionTextStyle,),
-              WeekdayPicker(weekdayNotifiers, textDelegate, onChange, isSundaySow),
+              Text(localizedText.repeatsOn, style: Constants.captionTextStyle,),
+              WeekdayPicker(onChange, weekDays),
             ],
           )
         ],

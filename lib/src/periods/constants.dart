@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:rrule_generator/localizations/text_utils.dart';
 
 class Constants{
   static BoxDecoration selectedBoxDecoration = BoxDecoration(
@@ -52,5 +53,17 @@ extension DateTimeExtension on DateTime {
     }
 
     return wom;
+  }
+}
+
+class WeekModel{
+  late int weekDay;
+  late String localizedName;
+  late String shortName;
+  late ValueNotifier<bool> isSelected;
+
+  WeekModel({required this.weekDay, required this.localizedName}){
+    this.isSelected = ValueNotifier(false);
+    this.shortName = TextUtils.getRRuleWeekDayInShort(this.weekDay);
   }
 }
