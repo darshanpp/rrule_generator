@@ -6,7 +6,11 @@ class Constants{
   static BoxDecoration selectedBoxDecoration = BoxDecoration(
     color: Color.fromRGBO(235, 242, 250, 1.0),
     borderRadius: BorderRadius.circular(5.0),
-    boxShadow: [BoxShadow(color: Color.fromRGBO(219, 233, 253, 1.0), spreadRadius: 3.0, blurRadius: 3.0)]
+    boxShadow: [BoxShadow(color: Color.fromRGBO(219, 233, 253, 1.0), spreadRadius: 1.5, blurRadius: 1.0)]
+  );
+  static BoxDecoration unSelectedBoxDecoration = BoxDecoration(
+    color: Color.fromRGBO(242, 242, 244, 1.0),
+    borderRadius: BorderRadius.circular(5.0),
   );
   static TextStyle selectedTextStyle = TextStyle(
     fontWeight: FontWeight.bold,
@@ -25,7 +29,7 @@ class Constants{
   );
 
   static String getDateString(DateTime date){
-    return DateFormat('dd MMM, yyyy').format(date);
+    return DateFormat('dd MMM, yyyy', TextUtils.currentLocale).format(date);
   }
 }
 
@@ -36,6 +40,7 @@ enum EndsType{
 }
 
 enum RepeatsEvery{
+  never,
   daily,
   weekly,
   monthly,

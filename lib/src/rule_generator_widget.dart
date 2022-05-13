@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rrule_generator/localizations/localized_text.dart';
+import 'package:rrule_generator/localizations/text_utils.dart';
+import 'package:rrule_generator/src/never.dart';
 import 'package:rrule_generator/src/periods/constants.dart';
 import 'package:rrule_generator/src/periods/period.dart';
 import 'package:rrule_generator/src/periods/pickers/date_picker.dart';
@@ -13,6 +15,7 @@ class RRuleGenerator extends StatelessWidget {
   final Function(String newValue, DateTime startDate)? onChange;
   final String initialRRule;
   LocalizedText localizedTextFromApp;
+  String currentLocale;
 
   final frequencyNotifier = ValueNotifier<RepeatsEvery?>(RepeatsEvery.daily);
   final countTypeNotifier = ValueNotifier<EndsType>(EndsType.never);
@@ -29,11 +32,13 @@ class RRuleGenerator extends StatelessWidget {
     this.onChange,
     this.startDate,
     required this.localizedTextFromApp,
+    this.currentLocale = 'en_US',
     this.startWeekWith = DateTime.monday,
     this.initialRRule = ''})
       : super(key: key) {
     startDate ??= DateTime.now();
     periodWidgets.addAll([
+      Never(valueChanged, initialRRule, startDate!),
       Daily(valueChanged, initialRRule, startDate!),
       Weekly(valueChanged, initialRRule, startDate!, startWeekWith),
       Monthly(valueChanged, initialRRule, startDate!),
@@ -45,7 +50,9 @@ class RRuleGenerator extends StatelessWidget {
 
   void initializeData(){
     localizedText = localizedTextFromApp;
+    TextUtils.currentLocale = currentLocale;
     repeatsEveryList = [
+      localizedText.repeatNever,
       localizedText.repeatDaily,
       localizedText.repeatWeekly,
       localizedText.repeatMonthly,
@@ -80,7 +87,7 @@ class RRuleGenerator extends StatelessWidget {
       frequencyNotifier.value = RepeatsEvery.yearly;
     }
     else if (initialRRule == '') {
-      frequencyNotifier.value = null;
+      frequencyNotifier.value = RepeatsEvery.never;
     }
 
     if (initialRRule.contains('COUNT')) {
@@ -108,7 +115,7 @@ class RRuleGenerator extends StatelessWidget {
   String getRRule() {
     int interval = int.tryParse(intervalController.text) ?? 0;
 
-    if (frequencyNotifier.value == null) {
+    if (frequencyNotifier.value == RepeatsEvery.never) {
       return '';
     }
 
@@ -134,150 +141,187 @@ class RRuleGenerator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: ValueListenableBuilder<RepeatsEvery?>(
-          valueListenable: frequencyNotifier,
-          builder: (BuildContext context, period, Widget? child) =>
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(localizedText.repeatsEvery, style: Constants.captionTextStyle,),
-                  SizedBox(height: 4.0,),
-                  Row(
-                    children: [
-                      Expanded(
-                        flex: 1,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: IntervalPicker(intervalController, valueChanged),
-                        )),
-                      Expanded(
-                        flex: 5,
-                        child: Row(
-                          children: List.generate(RepeatsEvery.values.length, (index) => Expanded(
-                            child: GestureDetector(
-                              onTap: (){
-                                frequencyNotifier.value = RepeatsEvery.values[index];
-                                valueChanged();
-                              },
-                              child: Container(
-                                decoration: period == RepeatsEvery.values[index] ? Constants.selectedBoxDecoration : null,
-                                child: FittedBox(
-                                  fit: BoxFit.scaleDown,
-                                  child: Center(child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text(repeatsEveryList[index], style: period == RepeatsEvery.values[index] ? Constants.selectedTextStyle : Constants.unSelectedTextStyle,),
-                                  )),
-                                )
-                              ),
-                            ),
-                          ))
-                        ),
-                      ),
-                      
-                    ],
-                  ),
-                  SizedBox(height: period == null ? 0 : 16),
-                  period == null ? Container() : periodWidgets[period.index],
-                  SizedBox(height: period == null ? 0 : 16),
-                  Text(localizedText.start, style: Constants.captionTextStyle,),
-                  Row(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Text(localizedText.onDate, style: Constants.unSelectedTextStyle),
-                      ),
-                      RRuleDatePicker(
-                        date: startDate!,
-                        onChange: (date){
-                          startDate = date;
-                          periodWidgets.forEach((i){i.refresh(date);});
-                          valueChanged();
-                        },
-                      ),
-                    ],
-                  ),
-                  period == null
-                      ? Container()
-                      : ValueListenableBuilder<EndsType>(
-                    valueListenable: countTypeNotifier,
-                    builder:
-                        (BuildContext context, countType, Widget? child) =>
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            SizedBox(height: 16),
-                            Text(localizedText.ends, style: Constants.captionTextStyle,),
-                          ]+ List.generate(EndsType.values.length, (index){
-                            return GestureDetector(
-                              onTap: (){
-                                countTypeNotifier.value = EndsType.values[index];
-                                valueChanged();
-                              },
+      ValueListenableBuilder<RepeatsEvery?>(
+        valueListenable: frequencyNotifier,
+        builder: (BuildContext context, period, Widget? child) =>
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: List.generate(RepeatsEvery.values.length, (index) => Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 4.0),
+                          child: GestureDetector(
+                            onTap: (){
+                              frequencyNotifier.value = RepeatsEvery.values[index];
+                              valueChanged();
+                            },
+                            child: Container(
+                              decoration: period == RepeatsEvery.values[index] ? Constants.selectedBoxDecoration : Constants.unSelectedBoxDecoration,
                               child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Container(
-                                  decoration: EndsType.values[index] == countTypeNotifier.value ? Constants.selectedBoxDecoration : null,
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        flex: 1,
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Text(
-                                            endsOptionList[index],
-                                            style: EndsType.values[index] == countTypeNotifier.value ? Constants.selectedTextStyle : Constants.unSelectedTextStyle,
-                                          ),
+                                padding: const EdgeInsets.all(12.0),
+                                child: Text(repeatsEveryList[index], style: period == RepeatsEvery.values[index] ? Constants.selectedTextStyle : Constants.unSelectedTextStyle,),
+                              )
+                            ),
+                          ),
+                        ),
+                        AnimatedSize(
+                          duration: Duration(milliseconds: 300,),
+                          alignment: Alignment.topCenter,
+                          child: period == RepeatsEvery.values[index] && period != RepeatsEvery.never ? Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                periodWidgets[index],
+                                SizedBox(height: 16),
+                                Text(localizedText.repeatsEvery, style: Constants.captionTextStyle,),
+                                SizedBox(height: 4.0,),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Container(
+                                    width: 72,
+                                    child: IntervalPicker(intervalController, valueChanged)),
+                                )
+                              ],
+                            ),
+                          )
+                          : SizedBox(),
+                        )
+                      ],
+                    ))
+                  ),
+                ),
+                Visibility(
+                  visible: period != RepeatsEvery.never,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16.0),
+                    child: Container(height: 12, color: Color.fromRGBO(243, 242, 244, 1.0),),
+                  ),
+                ),
+
+                Visibility(
+                  visible: period != RepeatsEvery.never,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: 16),
+                        Text(localizedText.start, style: Constants.captionTextStyle,),
+                        Row(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Text(localizedText.onDate, style: Constants.unSelectedTextStyle),
+                            ),
+                            RRuleDatePicker(
+                              date: startDate!,
+                              onChange: (date){
+                                startDate = date;
+                                periodWidgets.forEach((i){i.refresh(date);});
+                                valueChanged();
+                              },
+                            ),
+                          ],
+                        ),
+                        period == null
+                            ? Container()
+                            : ValueListenableBuilder<EndsType>(
+                          valueListenable: countTypeNotifier,
+                          builder:
+                              (BuildContext context, countType, Widget? child) =>
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  SizedBox(height: 16),
+                                  Text(localizedText.ends, style: Constants.captionTextStyle,),
+                                ]+ List.generate(EndsType.values.length, (index){
+                                  return GestureDetector(
+                                    onTap: (){
+                                      countTypeNotifier.value = EndsType.values[index];
+                                      valueChanged();
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Container(
+                                        decoration: EndsType.values[index] == countTypeNotifier.value ? Constants.selectedBoxDecoration : null,
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                              flex: 1,
+                                              child: Padding(
+                                                padding: const EdgeInsets.all(8.0),
+                                                child: Text(
+                                                  endsOptionList[index],
+                                                  style: EndsType.values[index] == countTypeNotifier.value ? Constants.selectedTextStyle : Constants.unSelectedTextStyle,
+                                                ),
+                                              ),
+                                            ),
+                                            index == EndsType.endOn.index ? Expanded(
+                                              flex: 3,
+                                              child: ValueListenableBuilder(
+                                                valueListenable: pickedDateNotifier,
+                                                builder: (context, DateTime pickedDate, _) {
+                                                  return AbsorbPointer(
+                                                    absorbing: EndsType.values[index] != countTypeNotifier.value,
+                                                    child: Row(
+                                                      mainAxisSize: MainAxisSize.min,
+                                                      children: [
+                                                        RRuleDatePicker(
+                                                          date: pickedDate, 
+                                                          onChange: (picked){
+                                                            if (picked != null && picked != pickedDate) {
+                                                              pickedDateNotifier.value = picked;
+                                                              valueChanged();
+                                                            }
+                                                          }),
+                                                      ],
+                                                    ),
+                                                  );
+                                                }
+                                              ),
+                                            ):SizedBox(),
+                                            index == EndsType.after.index ? Expanded(
+                                              flex: 3,
+                                              child: AbsorbPointer(
+                                                absorbing: EndsType.values[index] != countTypeNotifier.value,
+                                                child: Row(
+                                                  children: [
+                                                    Expanded(
+                                                      flex: 2,
+                                                      child: IntervalPicker(instancesController, valueChanged)),
+                                                    SizedBox(width: 8.0,),
+                                                    Expanded(
+                                                      flex: 3,
+                                                      child: Text(localizedText.occurrence, style: Constants.unSelectedTextStyle,))
+                                                  ],
+                                                ),
+                                              ),
+                                            ): SizedBox()
+                                          ],
                                         ),
                                       ),
-                                      index == EndsType.endOn.index ? Expanded(
-                                        flex: 3,
-                                        child: ValueListenableBuilder(
-                                          valueListenable: pickedDateNotifier,
-                                          builder: (context, DateTime pickedDate, _) {
-                                            return AbsorbPointer(
-                                              absorbing: EndsType.values[index] != countTypeNotifier.value,
-                                              child: RRuleDatePicker(
-                                                date: pickedDate, 
-                                                onChange: (picked){
-                                                  if (picked != null && picked != pickedDate) {
-                                                    pickedDateNotifier.value = picked;
-                                                    valueChanged();
-                                                  }
-                                                }),
-                                            );
-                                          }
-                                        ),
-                                      ):SizedBox(),
-                                      index == EndsType.after.index ? Expanded(
-                                        flex: 3,
-                                        child: AbsorbPointer(
-                                          absorbing: EndsType.values[index] != countTypeNotifier.value,
-                                          child: Row(
-                                            children: [
-                                              Expanded(
-                                                flex: 2,
-                                                child: IntervalPicker(instancesController, valueChanged)),
-                                              SizedBox(width: 8.0,),
-                                              Expanded(
-                                                flex: 3,
-                                                child: Text(localizedText.occurrence, style: Constants.unSelectedTextStyle,))
-                                            ],
-                                          ),
-                                        ),
-                                      ): SizedBox()
-                                    ],
-                                  ),
-                                ),
+                                    ),
+                                  );
+                                }),  
                               ),
-                            );
-                          }),  
                         ),
+                
+                        ],
+                    ),
                   ),
-                ],
-              ),
-        ),
+                )              ],
+            ),
       );    
 }

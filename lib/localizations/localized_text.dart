@@ -39,7 +39,7 @@ class LocalizedText {
     this.repeatDaily = 'Daily',
     this.repeatWeekly = 'Weekly',
     this.repeatMonthly = 'Monthly',
-    this.repeatYearly = 'Yearly',
+    this.repeatYearly = 'Annually',
     this.repeatNever = 'Does not repeat'
   });
 }

@@ -42,9 +42,7 @@ class Weekly extends StatelessWidget implements Period {
       String initialWeekdays = initialRRule.substring(
           weekdayIndex, weekdayEnd == -1 ? initialRRule.length : weekdayEnd);
       weekDays.forEach((element) { 
-        if (initialWeekdays.contains(element.shortName)) {
-          element.isSelected.value = true;
-        }
+        element.isSelected.value = initialWeekdays.contains(element.shortName);
       });
     }
   }
@@ -81,6 +79,7 @@ class Weekly extends StatelessWidget implements Period {
 
   @override
   void refresh(DateTime date) {
-    
+    startDate = date;
+
   }
 }
