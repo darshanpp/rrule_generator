@@ -36,4 +36,8 @@ class TextUtils{
     return WeekModel(weekDay: day, localizedName: getLocalizedWeekDay(day));
   }
 
+  static String getDateString(DateTime date){
+    return DateFormat('dd MMM, yyyy', TextUtils.currentLocale).format(date);
+  }
+
 }

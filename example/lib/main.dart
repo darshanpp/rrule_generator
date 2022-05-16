@@ -17,13 +17,13 @@ class MyApp extends StatelessWidget {
         appBar: AppBar(),
         body: SingleChildScrollView(
           child: RRuleGenerator(
-            startDate: DateTime(2022,5,13),
-            startWeekWith: DateTime.wednesday,
+            startDate: DateTime.now(),
+            startWeekWith: DateTime.monday,
             initialRRule:'',
             localizedTextFromApp: LocalizedText(),
+            uiOptions: UIUtils(),
             onChange: (String newValue, startDate){
               print('RRule: $newValue');
-              print('Date: $startDate');
               // final rrule = RecurrenceRule.fromString(newValue);
 
               // final Iterable<DateTime> instances = rrule.getInstances(

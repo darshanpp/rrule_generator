@@ -1,37 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:rrule_generator/localizations/text_utils.dart';
 
-class Constants{
-  static BoxDecoration selectedBoxDecoration = BoxDecoration(
-    color: Color.fromRGBO(235, 242, 250, 1.0),
-    borderRadius: BorderRadius.circular(5.0),
-    boxShadow: [BoxShadow(color: Color.fromRGBO(219, 233, 253, 1.0), spreadRadius: 1.5, blurRadius: 1.0)]
-  );
-  static BoxDecoration unSelectedBoxDecoration = BoxDecoration(
-    color: Color.fromRGBO(242, 242, 244, 1.0),
-    borderRadius: BorderRadius.circular(5.0),
-  );
-  static TextStyle selectedTextStyle = TextStyle(
-    fontWeight: FontWeight.bold,
-    fontSize: 18,
-    color: Color.fromRGBO(25, 61, 122, 1.0)
-  );
-  static TextStyle unSelectedTextStyle = TextStyle(
-    fontSize: 18,
-  );
-  static TextStyle textFieldStyle = TextStyle(fontSize: 18, fontWeight: FontWeight.normal, color: Colors.black);
+class UIUtils{
+  BoxDecoration selectedBoxDecoration;
+  BoxDecoration unSelectedBoxDecoration;
+  TextStyle selectedTextStyle;
+  TextStyle unSelectedTextStyle;
+  TextStyle textFieldStyle;
+  TextStyle captionTextStyle;
 
-  static TextStyle captionTextStyle = TextStyle(
-    fontWeight: FontWeight.bold,
-    fontSize: 18,
-    color: Color.fromRGBO(73, 80, 99, 1.0)
-  );
+  UIUtils({
+    this.captionTextStyle = const TextStyle(fontSize: 18, fontWeight: FontWeight.normal, color: Colors.black),
+    this.textFieldStyle = const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Color.fromRGBO(73, 80, 99, 1.0)),
+    this.unSelectedTextStyle = const TextStyle(fontSize: 18),
+    this.unSelectedBoxDecoration = const BoxDecoration(color: Color.fromRGBO(242, 242, 244, 1.0),borderRadius: BorderRadius.all(Radius.circular(5.0)),),
+    this.selectedBoxDecoration = const BoxDecoration(color: Color.fromRGBO(235, 242, 250, 1.0),borderRadius: BorderRadius.all(Radius.circular(5.0)), boxShadow: [BoxShadow(color: Color.fromRGBO(219, 233, 253, 1.0), spreadRadius: 1.5, blurRadius: 1.0)]),
+    this.selectedTextStyle = const TextStyle(fontWeight: FontWeight.bold,fontSize: 18,color: Color.fromRGBO(25, 61, 122, 1.0))
+  });
 
-  static String getDateString(DateTime date){
-    return DateFormat('dd MMM, yyyy', TextUtils.currentLocale).format(date);
-  }
 }
+
+UIUtils uiUtils = UIUtils();
 
 enum EndsType{
   never,

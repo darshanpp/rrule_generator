@@ -10,6 +10,7 @@ class Period extends Widget {
 
   String getRRule() => throw UnimplementedError();
   void refresh(DateTime date) => throw UnimplementedError();
+  void reset() => throw UnimplementedError();
 
   void handleInitialRRule() => throw UnimplementedError();
 

@@ -29,11 +29,11 @@ class WeekdayPicker extends StatelessWidget {
                           return ConstrainedBox(
                             constraints: BoxConstraints(minHeight: constraints.maxWidth, minWidth: constraints.maxWidth),
                             child: Container(
-                              decoration: value ? Constants.selectedBoxDecoration : null,
+                              decoration: value ? uiUtils.selectedBoxDecoration : null,
                               child: Center(
                                 child: Text(
                                   weekDays[index].localizedName.characters.first.toUpperCase(),
-                                  style: value ? Constants.selectedTextStyle : Constants.unSelectedTextStyle,
+                                  style: value ? uiUtils.selectedTextStyle : uiUtils.unSelectedTextStyle,
                                 )
                               )
                             ),

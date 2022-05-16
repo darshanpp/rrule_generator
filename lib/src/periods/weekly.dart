@@ -70,7 +70,7 @@ class Weekly extends StatelessWidget implements Period {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(height: 8.0,),
-              Text(localizedText.repeatsOn, style: Constants.captionTextStyle,),
+              Text(localizedText.repeatsOn, style: uiUtils.captionTextStyle,),
               WeekdayPicker(onChange, weekDays),
             ],
           )
@@ -81,5 +81,9 @@ class Weekly extends StatelessWidget implements Period {
   void refresh(DateTime date) {
     startDate = date;
 
+  }
+  @override
+  void reset() {
+    weekDays.forEach((element) { element.isSelected.value = element.weekDay == startDate.weekday;});
   }
 }

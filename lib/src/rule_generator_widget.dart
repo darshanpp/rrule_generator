@@ -27,6 +27,7 @@ class RRuleGenerator extends StatelessWidget {
   List<String> repeatsEveryList = [];
   List<String> endsOptionList = [];
   int startWeekWith;
+  UIUtils? uiOptions;
 
   RRuleGenerator({Key? key,
     this.onChange,
@@ -34,9 +35,11 @@ class RRuleGenerator extends StatelessWidget {
     required this.localizedTextFromApp,
     this.currentLocale = 'en_US',
     this.startWeekWith = DateTime.monday,
+    this.uiOptions,
     this.initialRRule = ''})
       : super(key: key) {
     startDate ??= DateTime.now();
+    initializeData();
     periodWidgets.addAll([
       Never(valueChanged, initialRRule, startDate!),
       Daily(valueChanged, initialRRule, startDate!),
@@ -44,11 +47,11 @@ class RRuleGenerator extends StatelessWidget {
       Monthly(valueChanged, initialRRule, startDate!),
       Yearly(valueChanged, initialRRule, startDate!),
     ]);
-    initializeData();
     handleInitialRRule();
   }
 
   void initializeData(){
+    uiUtils = uiOptions ?? UIUtils();
     localizedText = localizedTextFromApp;
     TextUtils.currentLocale = currentLocale;
     repeatsEveryList = [
@@ -164,13 +167,14 @@ class RRuleGenerator extends StatelessWidget {
                           child: GestureDetector(
                             onTap: (){
                               frequencyNotifier.value = RepeatsEvery.values[index];
+                              resetValues();
                               valueChanged();
                             },
                             child: Container(
-                              decoration: period == RepeatsEvery.values[index] ? Constants.selectedBoxDecoration : Constants.unSelectedBoxDecoration,
+                              decoration: period == RepeatsEvery.values[index] ? uiUtils.selectedBoxDecoration : uiUtils.unSelectedBoxDecoration,
                               child: Padding(
                                 padding: const EdgeInsets.all(12.0),
-                                child: Text(repeatsEveryList[index], style: period == RepeatsEvery.values[index] ? Constants.selectedTextStyle : Constants.unSelectedTextStyle,),
+                                child: Text(repeatsEveryList[index], style: period == RepeatsEvery.values[index] ? uiUtils.selectedTextStyle : uiUtils.unSelectedTextStyle,),
                               )
                             ),
                           ),
@@ -185,7 +189,7 @@ class RRuleGenerator extends StatelessWidget {
                               children: [
                                 periodWidgets[index],
                                 SizedBox(height: 16),
-                                Text(localizedText.repeatsEvery, style: Constants.captionTextStyle,),
+                                Text(localizedText.repeatsEvery, style: uiUtils.captionTextStyle,),
                                 SizedBox(height: 4.0,),
                                 Padding(
                                   padding: const EdgeInsets.all(8.0),
@@ -218,12 +222,12 @@ class RRuleGenerator extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         SizedBox(height: 16),
-                        Text(localizedText.start, style: Constants.captionTextStyle,),
+                        Text(localizedText.start, style: uiUtils.captionTextStyle,),
                         Row(
                           children: [
                             Padding(
                               padding: const EdgeInsets.all(16.0),
-                              child: Text(localizedText.onDate, style: Constants.unSelectedTextStyle),
+                              child: Text(localizedText.onDate, style: uiUtils.unSelectedTextStyle),
                             ),
                             RRuleDatePicker(
                               date: startDate!,
@@ -245,7 +249,7 @@ class RRuleGenerator extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
                                   SizedBox(height: 16),
-                                  Text(localizedText.ends, style: Constants.captionTextStyle,),
+                                  Text(localizedText.ends, style: uiUtils.captionTextStyle,),
                                 ]+ List.generate(EndsType.values.length, (index){
                                   return GestureDetector(
                                     onTap: (){
@@ -255,7 +259,7 @@ class RRuleGenerator extends StatelessWidget {
                                     child: Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Container(
-                                        decoration: EndsType.values[index] == countTypeNotifier.value ? Constants.selectedBoxDecoration : null,
+                                        decoration: EndsType.values[index] == countTypeNotifier.value ? uiUtils.selectedBoxDecoration : null,
                                         child: Row(
                                           children: [
                                             Expanded(
@@ -264,7 +268,7 @@ class RRuleGenerator extends StatelessWidget {
                                                 padding: const EdgeInsets.all(8.0),
                                                 child: Text(
                                                   endsOptionList[index],
-                                                  style: EndsType.values[index] == countTypeNotifier.value ? Constants.selectedTextStyle : Constants.unSelectedTextStyle,
+                                                  style: EndsType.values[index] == countTypeNotifier.value ? uiUtils.selectedTextStyle : uiUtils.unSelectedTextStyle,
                                                 ),
                                               ),
                                             ),
@@ -304,7 +308,7 @@ class RRuleGenerator extends StatelessWidget {
                                                     SizedBox(width: 8.0,),
                                                     Expanded(
                                                       flex: 3,
-                                                      child: Text(localizedText.occurrence, style: Constants.unSelectedTextStyle,))
+                                                      child: Text(localizedText.occurrence, style: uiUtils.unSelectedTextStyle,))
                                                   ],
                                                 ),
                                               ),
@@ -323,5 +327,67 @@ class RRuleGenerator extends StatelessWidget {
                   ),
                 )              ],
             ),
-      );    
+      );  
+
+  void resetValues(){
+    intervalController.text = '1';
+    switch(frequencyNotifier.value){
+      case RepeatsEvery.never:
+        break;
+      case RepeatsEvery.daily:
+        break;
+      case RepeatsEvery.weekly:
+        periodWidgets[frequencyNotifier.value!.index].reset();
+        break;
+      case RepeatsEvery.monthly:
+        periodWidgets[frequencyNotifier.value!.index].reset();
+        break;
+      case RepeatsEvery.yearly:
+        break;
+      default: break;
+    }
+    resetEndValues();
+  }
+
+  void resetEndValues(){
+    switch(frequencyNotifier.value){
+      case RepeatsEvery.never:
+        break;
+      case RepeatsEvery.daily:
+        if(countTypeNotifier.value != EndsType.endOn){
+          var start = startDate ?? DateTime.now();
+          pickedDateNotifier.value = DateTime(start.year, start.month+1, start.day);
+        }
+        if(countTypeNotifier.value != EndsType.after){
+          instancesController.text = '30';
+        }
+        break;
+      case RepeatsEvery.weekly:
+        if(countTypeNotifier.value != EndsType.endOn){
+          var start = startDate ?? DateTime.now();
+          pickedDateNotifier.value = DateTime(start.year, start.month + 3, start.day);        }
+        if(countTypeNotifier.value != EndsType.after){
+          instancesController.text = '13';
+        }
+        break;
+      case RepeatsEvery.monthly:
+        if(countTypeNotifier.value != EndsType.endOn){
+          var start = startDate ?? DateTime.now();
+          pickedDateNotifier.value = DateTime(start.year + 1, start.month, start.day);
+        }
+        if(countTypeNotifier.value != EndsType.after){
+          instancesController.text = '12';
+        }
+        break;
+      case RepeatsEvery.yearly:
+        if(countTypeNotifier.value != EndsType.endOn){
+          var start = startDate ?? DateTime.now();
+          pickedDateNotifier.value = DateTime(start.year + 5, start.month, start.day);        }
+        if(countTypeNotifier.value != EndsType.after){
+          instancesController.text = '5';
+        }
+        break;
+      default: break;
+    }
+  }  
 }

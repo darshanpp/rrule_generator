@@ -112,11 +112,11 @@ class Monthly extends StatelessWidget implements Period {
                     items: [
                       DropdownMenuItem(
                         value: 0,
-                        child: Text(localizedText.monthlyOnDay + ' ${dayNotifier.value}', style: monthType == 0 ? Constants.textFieldStyle : null,),
+                        child: Text(localizedText.monthlyOnDay + ' ${dayNotifier.value}', style: monthType == 0 ? uiUtils.textFieldStyle : null,),
                       ),
                       DropdownMenuItem(
                         value: 1,
-                        child: Text(localizedText.monthlyOnThe + ' ${mapWomToWords(monthDayNotifier.value)} ${weekdayNotifier.value.localizedName}', style: monthType == 1 ? Constants.textFieldStyle : null,),
+                        child: Text(localizedText.monthlyOnThe + ' ${mapWomToWords(monthDayNotifier.value)} ${weekdayNotifier.value.localizedName}', style: monthType == 1 ? uiUtils.textFieldStyle : null,),
                       ),
                     ],
                   ),
@@ -146,5 +146,9 @@ class Monthly extends StatelessWidget implements Period {
     weekdayNotifier.value = TextUtils.weekDays.firstWhere((element) => element.weekDay == date.weekday);
     dayNotifier.value = date.day;
     monthTypeNotifier.notifyListeners();
+  }
+  @override
+  void reset() {
+    monthTypeNotifier.value = 0;
   }
 }

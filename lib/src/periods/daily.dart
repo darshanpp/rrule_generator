@@ -44,6 +44,9 @@ class Daily extends StatelessWidget implements Period {
   @override
   void refresh(DateTime date) {
   }
+  @override
+  void reset() {
+  }
 
  
 }

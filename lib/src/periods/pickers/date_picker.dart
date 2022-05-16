@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rrule_generator/localizations/text_utils.dart';
 import 'package:rrule_generator/src/periods/constants.dart';
 
 class RRuleDatePicker extends StatefulWidget {
@@ -29,7 +30,7 @@ class _RRuleDatePickerState extends State<RRuleDatePicker> {
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 8.0),
         decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Color.fromRGBO(238, 239, 243, 1.0)))),
-        child: Text(Constants.getDateString(widget.date), style: Constants.textFieldStyle,),
+        child: Text(TextUtils.getDateString(widget.date), style: uiUtils.textFieldStyle,),
       ),
     );
   }

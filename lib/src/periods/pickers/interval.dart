@@ -23,7 +23,7 @@ class _IntervalPickerState extends State<IntervalPicker> {
           border: UnderlineInputBorder(borderSide: BorderSide(color: 
           Color.fromRGBO(238, 239, 243, 1.0)))
         ),
-        style: Constants.textFieldStyle,
+        style: uiUtils.textFieldStyle,
         inputFormatters: [
           FilteringTextInputFormatter.digitsOnly,
         ],

@@ -76,4 +76,7 @@ class Yearly extends StatelessWidget implements Period {
   void refresh(DateTime date) {
 
   }
+  @override
+  void reset() {
+  }
 }
