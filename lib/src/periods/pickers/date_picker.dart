@@ -19,6 +19,7 @@ class _RRuleDatePickerState extends State<RRuleDatePicker> {
       onTap: ()async{
         var selectedDate = await showDatePicker(
           context: context, 
+          locale: TextUtils.getCurrentLocale(),
           initialDate: (widget.date != null) ? widget.date : DateTime.now(),
           firstDate: DateTime(1900),
           lastDate: DateTime(2101));

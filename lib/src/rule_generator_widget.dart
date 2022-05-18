@@ -92,6 +92,7 @@ class RRuleGenerator extends StatelessWidget {
     else if (initialRRule == '') {
       frequencyNotifier.value = RepeatsEvery.never;
     }
+    resetEndValues();
 
     if (initialRRule.contains('COUNT')) {
       countTypeNotifier.value = EndsType.after;
@@ -117,29 +118,37 @@ class RRuleGenerator extends StatelessWidget {
 
   String getRRule() {
     int interval = int.tryParse(intervalController.text) ?? 0;
-
+    String rule = '';
     if (frequencyNotifier.value == RepeatsEvery.never) {
       return '';
     }
 
     if (countTypeNotifier.value == EndsType.never) {
-      return 'RRULE:' + periodWidgets[frequencyNotifier.value!.index].getRRule() + ';INTERVAL=${interval > 0 ? interval : 1}';
+      rule = 'RRULE:' + periodWidgets[frequencyNotifier.value!.index].getRRule();
     } 
     else if (countTypeNotifier.value == EndsType.after) {
-      return 'RRULE:' +
+      rule = 'RRULE:' +
           periodWidgets[frequencyNotifier.value!.index].getRRule() +
-          ';COUNT=${instancesController.text}'+ ';INTERVAL=${interval > 0 ? interval : 1}';
+          ';COUNT=${instancesController.text}';
     }
-    DateTime pickedDate = pickedDateNotifier.value;
+    else{
+      DateTime pickedDate = pickedDateNotifier.value;
 
-    String day =
-    pickedDate.day > 9 ? '${pickedDate.day}' : '0${pickedDate.day}';
-    String month =
-    pickedDate.month > 9 ? '${pickedDate.month}' : '0${pickedDate.month}';
+      String day =
+      pickedDate.day > 9 ? '${pickedDate.day}' : '0${pickedDate.day}';
+      String month =
+      pickedDate.month > 9 ? '${pickedDate.month}' : '0${pickedDate.month}';
 
-    return 'RRULE:' +
-        periodWidgets[frequencyNotifier.value!.index].getRRule() +
-        ';UNTIL=${pickedDate.year}$month$day'+ ';INTERVAL=${interval > 0 ? interval : 1}';      
+      rule = 'RRULE:' +
+          periodWidgets[frequencyNotifier.value!.index].getRRule() +
+          ';UNTIL=${pickedDate.year}$month$day'; 
+    }
+    
+    var index = rule.indexOf(';');
+    var finalRule = (index < 0 ? rule.substring(0) : rule.substring(0, index)) + ';';
+    finalRule += 'INTERVAL=${interval > 0 ? interval : 1}';
+    finalRule += index < 0 ? '' : rule.substring(index);
+    return finalRule;         
   }
 
   @override

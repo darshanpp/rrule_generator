@@ -15,14 +15,14 @@ class Monthly extends StatelessWidget implements Period {
 
   final monthTypeNotifier = ValueNotifier(0);
   final monthDayNotifier = ValueNotifier(1);
-  final weekdayNotifier = ValueNotifier<WeekModel>(TextUtils.weekDays.first);
+  final weekdayNotifier = ValueNotifier<WeekModel>(TextUtils.getWeekDays().first);
   final dayNotifier = ValueNotifier(1);
 
   Monthly(this.onChange, this.initialRRule,this.startDate,{Key? key})
       : super(key: key) {
     
     monthDayNotifier.value = startDate.weekOfMonth-1;
-    weekdayNotifier.value = TextUtils.weekDays.firstWhere((element) => element.weekDay == startDate.weekday);
+    weekdayNotifier.value = TextUtils.getWeekDays().firstWhere((element) => element.weekDay == startDate.weekday);
     dayNotifier.value = startDate.day;
 
     if (initialRRule.contains('MONTHLY')){
@@ -58,7 +58,7 @@ class Monthly extends StatelessWidget implements Period {
 
       int weekdayIndex = initialRRule.indexOf('BYDAY=') + 6;
       String weekday = initialRRule.substring(weekdayIndex, weekdayIndex + 2);
-      weekdayNotifier.value = TextUtils.weekDays.firstWhere((element) => element.shortName == weekday);
+      weekdayNotifier.value = TextUtils.getWeekDays().firstWhere((element) => element.shortName == weekday);
       
     }
   }
@@ -104,7 +104,7 @@ class Monthly extends StatelessWidget implements Period {
                         dayNotifier.value = startDate.day;
                       }
                       else if(newMonthType == 1){
-                        weekdayNotifier.value = TextUtils.weekDays.firstWhere((element) => element.weekDay == startDate.weekday);
+                        weekdayNotifier.value = TextUtils.getWeekDays().firstWhere((element) => element.weekDay == startDate.weekday);
                         monthDayNotifier.value = startDate.weekOfMonth - 1;
                       }
                       onChange();
@@ -143,7 +143,7 @@ class Monthly extends StatelessWidget implements Period {
   void refresh(DateTime date) {
     startDate = date;
     monthDayNotifier.value = date.weekOfMonth-1;
-    weekdayNotifier.value = TextUtils.weekDays.firstWhere((element) => element.weekDay == date.weekday);
+    weekdayNotifier.value = TextUtils.getWeekDays().firstWhere((element) => element.weekDay == date.weekday);
     dayNotifier.value = date.day;
     monthTypeNotifier.notifyListeners();
   }

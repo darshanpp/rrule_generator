@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:rrule_generator/src/periods/constants.dart';
 
@@ -22,7 +23,7 @@ class TextUtils{
     }
   }
 
-  static List<WeekModel> weekDays = [
+  static List<WeekModel> getWeekDays() => [
     _generateWeekModelFor(DateTime.sunday),
     _generateWeekModelFor(DateTime.monday),
     _generateWeekModelFor(DateTime.tuesday),
@@ -38,6 +39,14 @@ class TextUtils{
 
   static String getDateString(DateTime date){
     return DateFormat('dd MMM, yyyy', TextUtils.currentLocale).format(date);
+  }
+
+  static Locale getCurrentLocale(){
+    switch(currentLocale){
+      case 'en_US': return Locale.fromSubtags(languageCode: 'en'); 
+      case 'nb_NO': return Locale.fromSubtags(languageCode: 'no'); 
+      default: return Locale.fromSubtags(languageCode: 'en'); 
+    }
   }
 
 }

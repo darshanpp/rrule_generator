@@ -25,7 +25,7 @@ class Weekly extends StatelessWidget implements Period {
   }
 
   void _initializeWeekDaysInDigits(int startDay){
-    weekDays = rotate(TextUtils.weekDays, startWeekWith%7);
+    weekDays = rotate(TextUtils.getWeekDays(), startWeekWith%7);
   }
   
   List<WeekModel> rotate(List<WeekModel> list, int v) {
