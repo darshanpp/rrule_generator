@@ -138,10 +138,10 @@ class RRuleGenerator extends StatelessWidget {
       pickedDate.day > 9 ? '${pickedDate.day}' : '0${pickedDate.day}';
       String month =
       pickedDate.month > 9 ? '${pickedDate.month}' : '0${pickedDate.month}';
-
+      String timeString = 'T235959';
       rule = 'RRULE:' +
           periodWidgets[frequencyNotifier.value!.index].getRRule() +
-          ';UNTIL=${pickedDate.year}$month$day'; 
+          ';UNTIL=${pickedDate.year}$month$day$timeString'; 
     }
     
     var index = rule.indexOf(';');
