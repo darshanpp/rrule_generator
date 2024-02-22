@@ -230,24 +230,29 @@ class RRuleGenerator extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        SizedBox(height: 16),
-                        Text(localizedText.start, style: uiUtils.captionTextStyle,),
-                        Row(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Text(localizedText.onDate, style: uiUtils.unSelectedTextStyle),
-                            ),
-                            RRuleDatePicker(
-                              date: startDate!,
-                              onChange: (date){
-                                startDate = date;
-                                periodWidgets.forEach((i){i.refresh(date);});
-                                valueChanged();
-                              },
-                            ),
-                          ],
-                        ),
+                        //  --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- 
+                        //  Hide Recurrance Start so that user don't change it.
+                        //  https://dynamicelements.atlassian.net/browse/DF-8281
+                        //  --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- 
+                        // SizedBox(height: 16),                        
+                        // Text(localizedText.start, style: uiUtils.captionTextStyle,),
+                        // Row(
+                        //   children: [
+                        //     Padding(
+                        //       padding: const EdgeInsets.all(16.0),
+                        //       child: Text(localizedText.onDate, style: uiUtils.unSelectedTextStyle),
+                        //     ),
+                        //     RRuleDatePicker(
+                        //       date: startDate!,
+                        //       onChange: (date){
+                        //         startDate = date;
+                        //         periodWidgets.forEach((i){i.refresh(date);});
+                        //         valueChanged();
+                        //       },
+                        //     ),
+                        //   ],
+                        // ),
+                        //  --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- 
                         period == null
                             ? Container()
                             : ValueListenableBuilder<EndsType>(
