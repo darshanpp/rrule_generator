@@ -19,7 +19,9 @@ class _IntervalPickerState extends State<IntervalPicker> {
         textAlign: TextAlign.center,
         controller: widget.controller,
         keyboardType: TextInputType.number,
+        maxLength: 2,
         decoration: InputDecoration(
+          counterText: '',
           border: UnderlineInputBorder(borderSide: BorderSide(color: 
           Color.fromRGBO(238, 239, 243, 1.0)))
         ),
