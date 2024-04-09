@@ -216,13 +216,13 @@ class RRuleGenerator extends StatelessWidget {
                     ))
                   ),
                 ),
-                Visibility(
-                  visible: period != RepeatsEvery.never,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 16.0),
-                    child: Container(height: 12, color: Color.fromRGBO(243, 242, 244, 1.0),),
-                  ),
-                ),
+                // Visibility(
+                //   visible: period != RepeatsEvery.never,
+                //   child: Padding(
+                //     padding: const EdgeInsets.symmetric(vertical: 16.0),
+                //     child: Container(height: 12, color: Color.fromRGBO(243, 242, 244, 1.0),),
+                //   ),
+                // ),
 
                 Visibility(
                   visible: period != RepeatsEvery.never,
