@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:rrule_generator/localizations/text_utils.dart';
 import 'package:rrule_generator/src/periods/constants.dart';
 import 'package:rrule_generator/src/periods/period.dart';
-
 import '../../localizations/localized_text.dart';
 
 class Monthly extends StatelessWidget implements Period {
@@ -93,6 +92,7 @@ class Monthly extends StatelessWidget implements Period {
                   ),
                   padding: EdgeInsets.symmetric(horizontal: 8.0),
                   child: DropdownButton(
+                    dropdownColor: (uiUtils.isDarkTheme ?? false) ? Colors.black : null,
                     value: monthType,
                     icon: Icon(Icons.keyboard_arrow_down),
                     isDense: false,

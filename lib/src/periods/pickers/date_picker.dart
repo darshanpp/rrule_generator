@@ -18,7 +18,18 @@ class _RRuleDatePickerState extends State<RRuleDatePicker> {
       behavior: HitTestBehavior.translucent,
       onTap: ()async{
         var selectedDate = await showDatePicker(
-          context: context, 
+            builder: (uiUtils.isDarkTheme ?? false) ? (BuildContext context, Widget? child) {
+              return Theme(
+                data: ThemeData.dark().copyWith(
+                colorScheme: ColorScheme.dark(
+                  primary: Colors.blue,
+                  onPrimary: Colors.white,
+                  onSurface: Colors.white,
+                )),
+                child: child ?? SizedBox(),
+              );
+            } : null,
+          context: context,
           locale: TextUtils.getCurrentLocale(),
           initialDate: (widget.date != null) ? widget.date : DateTime.now(),
           firstDate: DateTime(1900),

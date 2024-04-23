@@ -20,6 +20,7 @@ class _IntervalPickerState extends State<IntervalPicker> {
         controller: widget.controller,
         keyboardType: TextInputType.number,
         maxLength: 2,
+        cursorColor: (uiUtils.isDarkTheme ?? false) ? Colors.white : null,
         decoration: InputDecoration(
           counterText: '',
           border: UnderlineInputBorder(borderSide: BorderSide(color: 

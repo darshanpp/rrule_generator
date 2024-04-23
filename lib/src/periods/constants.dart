@@ -8,6 +8,7 @@ class UIUtils{
   TextStyle unSelectedTextStyle;
   TextStyle textFieldStyle;
   TextStyle captionTextStyle;
+  bool? isDarkTheme;
 
   UIUtils({
     this.captionTextStyle = const TextStyle(fontSize: 18, fontWeight: FontWeight.normal, color: Colors.black),
@@ -15,7 +16,8 @@ class UIUtils{
     this.unSelectedTextStyle = const TextStyle(fontSize: 18),
     this.unSelectedBoxDecoration = const BoxDecoration(color: Color.fromRGBO(242, 242, 244, 1.0),borderRadius: BorderRadius.all(Radius.circular(5.0)),),
     this.selectedBoxDecoration = const BoxDecoration(color: Color.fromRGBO(235, 242, 250, 1.0),borderRadius: BorderRadius.all(Radius.circular(5.0)), boxShadow: [BoxShadow(color: Color.fromRGBO(219, 233, 253, 1.0), spreadRadius: 1.5, blurRadius: 1.0)]),
-    this.selectedTextStyle = const TextStyle(fontWeight: FontWeight.bold,fontSize: 18,color: Color.fromRGBO(25, 61, 122, 1.0))
+    this.selectedTextStyle = const TextStyle(fontWeight: FontWeight.bold,fontSize: 18,color: Color.fromRGBO(25, 61, 122, 1.0)),
+    this.isDarkTheme = false
   });
 
 }
