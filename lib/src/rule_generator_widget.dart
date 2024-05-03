@@ -135,11 +135,21 @@ class RRuleGenerator extends StatelessWidget {
     else{
       DateTime pickedDate = pickedDateNotifier.value;
 
+      pickedDate = DateTime(pickedDate.year,pickedDate.month,pickedDate.day,23,59,59);
+
+      print('Picked date before utc is $pickedDate');
+      pickedDate = pickedDate.toUtc();
+      print('Picked date after utc is $pickedDate');
+
       String day =
       pickedDate.day > 9 ? '${pickedDate.day}' : '0${pickedDate.day}';
       String month =
       pickedDate.month > 9 ? '${pickedDate.month}' : '0${pickedDate.month}';
-      String timeString = 'T235959';
+      String hour = pickedDate.hour > 9 ? '${pickedDate.hour}' : '0${pickedDate.hour}';
+      String min = pickedDate.minute > 9 ? '${pickedDate.minute}' : '0${pickedDate.minute}';
+      String sec = pickedDate.second > 9 ? '${pickedDate.second}' : '0${pickedDate.second}';
+
+      String timeString = 'T$hour$min${sec}Z';
       rule = 'RRULE:' +
           periodWidgets[frequencyNotifier.value!.index].getRRule() +
           ';UNTIL=${pickedDate.year}$month$day$timeString'; 
