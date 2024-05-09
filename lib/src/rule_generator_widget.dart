@@ -329,7 +329,7 @@ class RRuleGenerator extends StatelessWidget {
                                                   children: [
                                                     Expanded(
                                                       flex: 2,
-                                                      child: IntervalPicker(instancesController, valueChanged)),
+                                                      child: IntervalPicker(instancesController, valueChanged,forOccurance: true)),
                                                     SizedBox(width: 8.0,),
                                                     Expanded(
                                                       flex: 3,

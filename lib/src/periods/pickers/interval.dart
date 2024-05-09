@@ -4,9 +4,10 @@ import 'package:rrule_generator/src/periods/constants.dart';
 
 class IntervalPicker extends StatefulWidget {
   final Function onChange;
+  final bool? forOccurance;
   final TextEditingController controller;
 
-  const IntervalPicker(this.controller, this.onChange, {Key? key})
+  const IntervalPicker(this.controller, this.onChange, {Key? key,this.forOccurance = false})
       : super(key: key);
 
   @override
@@ -19,7 +20,7 @@ class _IntervalPickerState extends State<IntervalPicker> {
         textAlign: TextAlign.center,
         controller: widget.controller,
         keyboardType: TextInputType.number,
-        maxLength: 2,
+        maxLength: (widget.forOccurance ?? false) ?  null : 2,
         cursorColor: (uiUtils.isDarkTheme ?? false) ? Colors.white : null,
         decoration: InputDecoration(
           counterText: '',
